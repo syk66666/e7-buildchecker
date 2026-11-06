@@ -38,5 +38,13 @@ class OracleTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             gate.evaluate("timeout", 0, report)
 
+    def test_extra_finding_rejected(self):
+        """错误集合多出一条 finding 时必须拒绝：判定要求精确集合，而不是超集。"""
+        findings = [{"type": t, "target": target, "dependency": dep, "evidence": ["test"]}
+                    for t, target, dep in gate.EXPECTED]
+        extra = {"type": "MISSING", "target": "app", "dependency": "third.h", "evidence": ["test"]}
+        with self.assertRaises(ValueError):
+            gate.evaluate("original-1", 1, successful(findings + [extra]))
+
 if __name__ == "__main__":
     unittest.main()
